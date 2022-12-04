@@ -157,10 +157,12 @@ with model:
     def stopword():
         stopwords = set(STOPWORDS)
         stopwords.add('room')
+        stopwords.add('rooms')
         stopwords.add('hotel')
         stopwords.add('rome')
+        return stopwords
 
-    stopwords = stopword()
+    stopwords_cust = stopword()
 #Output generation
 
     top_k = min(5, len(corpus))
@@ -174,7 +176,7 @@ with model:
 
         st.write("\n\n======================\n\n")
         st.write("Hotels that best accomodate the request:", query)
-        st.write("\nTop 5 most similar sentences in corpus:")
+        st.write("\nTop 5 most similar hotels to your request:")
 
         for score, idx in zip(top_results[0], top_results[1]):
 #            st.write("(Score: {:.4f})".format(score))
@@ -192,7 +194,7 @@ with model:
             st.write('This hotel is most frequently described as:')
             inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
             st.write(inter_summ[0])
-            wordcloud = WordCloud(stopwords = stopwords, max_words = 20, max_font_size=50,
+            wordcloud = WordCloud(stopwords = stopwords_cust, max_words = 30, max_font_size=50,
                                     colormap='Set2',
                                     collocations=True, background_color="white").generate(corpus[idx])
             plt.imshow(wordcloud, interpolation='bilinear')
