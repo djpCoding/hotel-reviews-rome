@@ -152,6 +152,15 @@ with model:
 
     hotel_descriptions = hotel_summ()
 
+#Adding and caching stopwords to increase speed
+    @st.cache(persist=True)
+    def stopword():
+        stopwords = set(STOPWORDS)
+        stopwords.add('room')
+        stopwords.add('hotel')
+        stopwords.add('rome')
+
+    stopwords = stopword()
 #Output generation
 
     top_k = min(5, len(corpus))
@@ -168,12 +177,18 @@ with model:
         st.write("\nTop 5 most similar sentences in corpus:")
 
         for score, idx in zip(top_results[0], top_results[1]):
-            st.write("(Score: {:.4f})".format(score))
+#            st.write("(Score: {:.4f})".format(score))
 #            st.write(corpus[idx], "(Score: {:.4f})".format(score))
             row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
             inter_frame = row_dict['hotelName'].to_frame().T
             inter_frame2 = np.asarray(inter_frame)
             st.subheader(inter_frame2[0,0] , "\n")
+            if score > .45:
+                st.markdown("_We show this as a great fit!_")
+            elif score > .35 and score <= .45:
+                 st.markdown("_We show this as a good fit!_")
+            else:
+                st.markdown('_We show this as a fair fit!_')
             st.write('This hotel is most frequently described as:')
             inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
             st.write(inter_summ[0])
