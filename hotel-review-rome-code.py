@@ -28,75 +28,161 @@ from tqdm import tqdm
 from sentence_transformers import SentenceTransformer, util
 import torch
 import torchvision
+import re
+import numpy as np
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
+import heapq
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+from PIL import Image
+st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.title('Rome! Your vacation Destination and Historic Wonderland')
 st.markdown('Rome is a city filled with thousands of years of history.')
 st.markdown('Finding the perfect hotel in the perfect spot can lead to a fulling vacation that will provide you with memories that last a life time.')
-st.markdown('Search for your most important characteristics for you, and we will provide accommodations most suitable to your desires.')
+st.markdown('Search for your desired characteritics, and we will provide accommodations most suitable to you.')
 
 st.image("https://media.timeout.com/images/105211701/image.jpg")
 
-@st.cache(persist=True)
+#@st.cache(persist=True)
+
+dataset = st.container()
+features = st.container()
+model = st.container()
 
 # Rome data importation and cleaning
-RomeReviewList = pd.read_csv('hotelReviewsInRome__en2019100120191005.csv')
-RomeReviewList['hotelName'] = RomeReviewList['hotelName'].str.split('\n').str[0]
-RomeReviewList['hotelName'] = RomeReviewList['hotelName'].str.split(' ').str[4:]
-RomeReviewList['hotelName'] = RomeReviewList['hotelName'].apply(lambda x: ' '.join(map(str, x)))
-RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+with dataset:
+    @st.cache(persist=True)
+    def load_data():
+        RomeReviewList = pd.read_csv('hotelReviewsInRome__en2019100120191005.csv')
+        RomeReviewList['hotelName'] = RomeReviewList['hotelName'].str.split('\n').str[0]
+        RomeReviewList['hotelName'] = RomeReviewList['hotelName'].str.split(' ').str[4:]
+        RomeReviewList['hotelName'] = RomeReviewList['hotelName'].apply(lambda x: ' '.join(map(str, x)))
+        return RomeReviewList
 
-#Combining reviews for encoding
-import re
+    RomeReviewList = load_data()
 
-RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
+    RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+    #Combining reviews for encoding
+    RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
 
-def lower_case(input_str):
-    input_str = input_str.lower()
-    return input_str
+    @st.cache(persist=True)
+    def lower_case(input_str):
+        input_str = input_str.lower()
+        return input_str
 
-RomeReviewCombined['all_review']= RomeReviewCombined['all_review'].apply(lambda x: lower_case(x))
+    RomeReviewCombined['all_review']= RomeReviewCombined['all_review'].apply(lambda x: lower_case(x))
+    Rome_sentences = RomeReviewCombined.set_index("all_review")
+    Rome_sentences = Rome_sentences["hotelName"].to_dict()
+    Rome_sentences_list = list(Rome_sentences.keys())
 
-Rome_sentences = RomeReviewCombined.set_index("all_review")
-Rome_sentences = Rome_sentences["hotelName"].to_dict()
-Rome_sentences_list = list(Rome_sentences.keys())
+    Rome = RomeReviewCombined
 
-Rome = RomeReviewCombined
+    Rome_sentences_list = [str(d) for d in tqdm(Rome_sentences_list)]
 
-Rome_sentences_list = [str(d) for d in tqdm(Rome_sentences_list)]
+    corpus = Rome_sentences_list
+    corpus_embeddings = embedder.encode(corpus,show_progress_bar=False)
+#    st.write(corpus_embeddings)
 
-corpus = Rome_sentences_list
-corpus_embeddings = embedder.encode(corpus,show_progress_bar=False)
-
+with model:
+    st.header('Search for Rome your way.')
 #Get User Input
-queries = []
 
-query = st.text_input('Rome hotel lookup', 'E.g., near the Vatican')
-st.write('The current hotel query is:', queries)
 
-queries = re.split('[!?.]', query)
-queries = [i for i in queries if i]
+    queries = []
+
+    query = st.text_input('Rome hotel lookup')
+    st.write('The current hotel query is:', query)
+
+    queries = re.split('[!?.]', query)
+    queries = [i for i in queries if i]
+
+
 
 #Sentence Transforms
-model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
-embeddings = model.encode(corpus)
+    model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
+    embeddings = model.encode(corpus)
+
+#Generating Hotel Summaries to display
+    hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
+    stopword = nltk.corpus.stopwords.words('english')
+
+    Rome_summary = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+
+    #word_frequencies = {}
+    @st.cache(persist=True)
+    def hotel_summ():
+        Rome_summary = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+        hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
+        stopword = nltk.corpus.stopwords.words('english')
+        for hotel in range(len(Rome_summary)):
+            word_frequencies = {}
+            mini_corpus = Rome_summary.iloc[hotel,1]
+            #  print(mini_corpus)
+            for word in nltk.word_tokenize(mini_corpus):
+                if word not in stopwords:
+                  if word not in word_frequencies:
+                    word_frequencies[word] = 1
+                  else:
+                    word_frequencies[word] += 1
+            maximum_frequency = max(word_frequencies.values())
+            for word in word_frequencies:
+                word_frequencies[word] = (word_frequencies[word]/maximum_frequency)
+            sentence_list = nltk.sent_tokenize(mini_corpus)
+            #  print(sentence_list)
+            sentence_scores = {}
+            for sent in sentence_list:
+                for word in nltk.word_tokenize(sent.lower()):
+                    if word in word_frequencies:
+                        if len(sent.split(' ')) < 30:
+                            if sent not in sentence_scores.keys():
+                                sentence_scores[sent] = word_frequencies[word]
+                            else:
+                                sentence_scores[sent] += word_frequencies[word]
+            summary_sentences = heapq.nlargest(7, sentence_scores, key=sentence_scores.get)
+            summary = ' '.join(summary_sentences)
+            #  print(summary)
+            hotel_summaries = hotel_summaries.append({'Hotel' : RomeReviewCombined.iloc[hotel,0], 'Summary': summary}, ignore_index = True)
+        return hotel_summaries
+
+
+    hotel_descriptions = hotel_summ()
 
 #Output generation
 
-top_k = min(5, len(corpus))
-for query in queries:
+    top_k = min(5, len(corpus))
+    for query in queries:
 
-    query_embedding = model.encode(query, convert_to_tensor=True)
+        query_embedding = model.encode(query, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
-    cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
-    top_results = torch.topk(cos_scores, k=top_k)
+        cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
+        top_results = torch.topk(cos_scores, k=top_k)
 
-    print("\n\n======================\n\n")
-    print("Query:", query)
-    print("\nTop 5 most similar sentences in corpus:")
+        st.write("\n\n======================\n\n")
+        st.write("Hotels that best accomodate the request:", query)
+        st.write("\nTop 5 most similar sentences in corpus:")
 
-    for score, idx in zip(top_results[0], top_results[1]):
-        print("(Score: {:.4f})".format(score))
-        print(corpus[idx], "(Score: {:.4f})".format(score))
-        row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
-        print("paper_id:  " , row_dict['hotelName'] , "\n")
+        for score, idx in zip(top_results[0], top_results[1]):
+            st.write("(Score: {:.4f})".format(score))
+#            st.write(corpus[idx], "(Score: {:.4f})".format(score))
+            row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
+            inter_frame = row_dict['hotelName'].to_frame().T
+            inter_frame2 = np.asarray(inter_frame)
+            st.subheader(inter_frame2[0,0] , "\n")
+            st.write('This hotel is most frequently described as:')
+            inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
+            st.write(inter_summ[0])
+            wordcloud = WordCloud(stopwords = stopwords, max_words = 20, max_font_size=50,
+                                    colormap='Set2',
+                                    collocations=True, background_color="white").generate(corpus[idx])
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis('off')
+
+            st.pyplot()
+            #st.plyplt.axis('off')
+            #plt.show()
