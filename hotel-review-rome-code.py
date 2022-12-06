@@ -15,8 +15,7 @@ from heapq import nlargest
 from PIL import Image
 import os
 import spacy
-import en_core_web_sm
-nlp = en_core_web_sm.load()
+nlp = spacy.load("en_core_web_sm")
 from spacy import displacy
 stopwords=list(STOP_WORDS)
 from string import punctuation
