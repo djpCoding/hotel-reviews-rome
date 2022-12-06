@@ -177,7 +177,7 @@ with model:
     queries = []
 
     query = st.text_input('Rome hotel lookup')
-    st.write('The current hotel query is:', query)
+#    st.write('The current hotel query is:', query)
 
     queries = re.split('[!?.]', query)
     queries = [i for i in queries if i]
