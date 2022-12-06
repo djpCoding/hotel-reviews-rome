@@ -116,7 +116,8 @@ with model:
 
 #Generating Hotel Summaries to display
     hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
-    stopword = nltk.corpus.stopwords.words('english')
+    stopword = set(STOPWORDS)
+#    stopword = nltk.corpus.stopwords.words('english')
 
     Rome_summary = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
 
