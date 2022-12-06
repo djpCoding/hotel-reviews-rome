@@ -15,6 +15,7 @@ from heapq import nlargest
 from PIL import Image
 import os
 import spacy
+from spacy.lang.en.examples import sentences
 nlp = spacy.load("en_core_web_sm")
 from spacy import displacy
 stopwords=list(STOP_WORDS)
