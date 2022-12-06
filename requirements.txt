@@ -5,7 +5,7 @@ sentence_transformers
 spacy
 scipy
 streamlit
-matplotlib
+matplotlib==3.6.0
 nltk==3.6.7
 wordcloud==1.8.1
 numpy
