@@ -74,7 +74,7 @@ with dataset:
     RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
 #        return RomeReviewCombined
 
-    RomeReviewCombined = combine_review()
+    #RomeReviewCombined = combine_review()
 
     @st.cache(persist=True)
     def lower_case(input_str):
@@ -177,7 +177,7 @@ with model:
     queries = []
 
     query = st.text_input('Rome hotel lookup')
-#    st.write('The current hotel query is:', query)
+    st.write('The current hotel query is:', query)
 
     queries = re.split('[!?.]', query)
     queries = [i for i in queries if i]
