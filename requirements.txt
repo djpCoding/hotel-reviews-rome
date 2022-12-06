@@ -3,10 +3,10 @@ torchvision
 tqdm
 sentence_transformers
 spacy
-scipy
+scipy==1.9.2
 streamlit==1.15.1
 matplotlib==3.6.0
 nltk==3.6.7
 wordcloud==1.8.1
-numpy
+numpy==1.23.4
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
