@@ -126,7 +126,8 @@ with model:
     def hotel_summ():
         Rome_summary = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
         hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
-        stopword = nltk.corpus.stopwords.words('english')
+        stopword = set(STOPWORDS)
+        #nltk.corpus.stopwords.words('english')
         for hotel in range(len(Rome_summary)):
             word_frequencies = {}
             mini_corpus = Rome_summary.iloc[hotel,1]
