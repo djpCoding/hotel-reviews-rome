@@ -66,9 +66,14 @@ with dataset:
 
     RomeReviewList = load_data()
 
-    RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+    @st.cache(persist=True, allow_output_mutation=True)
+    def combine_review():
+        RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
     #Combining reviews for encoding
-    RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
+        RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
+        return RomeReviewCombined
+
+    RomeReviewCombined = combine_review()
 
     @st.cache(persist=True)
     def lower_case(input_str):
@@ -76,6 +81,7 @@ with dataset:
         return input_str
 
     RomeReviewCombined['all_review']= RomeReviewCombined['all_review'].apply(lambda x: lower_case(x))
+
     Rome_sentences = RomeReviewCombined.set_index("all_review")
     Rome_sentences = Rome_sentences["hotelName"].to_dict()
     Rome_sentences_list = list(Rome_sentences.keys())
@@ -85,8 +91,14 @@ with dataset:
     Rome_sentences_list = [str(d) for d in tqdm(Rome_sentences_list)]
 
     corpus = Rome_sentences_list
-    corpus_embeddings = embedder.encode(corpus,show_progress_bar=False)
+
+    @st.cache(persist=True)
+    def corp_embed():
+        corpus_embeddings = embedder.encode(corpus,show_progress_bar=False)
+        return corpus_embeddings
 #    st.write(corpus_embeddings)
+
+    corpus_embeddings = corp_embed()
 
 with model:
     st.header('Search for Rome your way.')
