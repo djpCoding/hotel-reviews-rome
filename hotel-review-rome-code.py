@@ -106,13 +106,7 @@ with model:
 #Get User Input
 
 
-    queries = []
 
-    query = st.text_input('Rome hotel lookup')
-    st.write('The current hotel query is:', query)
-
-    queries = re.split('[!?.]', query)
-    queries = [i for i in queries if i]
 
 
 
@@ -177,6 +171,14 @@ with model:
 
     stopwords_cust = stopword()
 #Output generation
+
+    queries = []
+
+    query = st.text_input('Rome hotel lookup')
+    st.write('The current hotel query is:', query)
+
+    queries = re.split('[!?.]', query)
+    queries = [i for i in queries if i]
 
     top_k = min(5, len(corpus))
     for query in queries:
