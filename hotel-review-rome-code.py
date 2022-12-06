@@ -67,12 +67,12 @@ with dataset:
 
     RomeReviewList = load_data()
 
-    @st.cache(persist=True, allow_output_mutation=True)
-    def combine_review():
-        RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
+#    @st.cache(persist=True, allow_output_mutation=True)
+#    def combine_review():
+    RomeReviewCombined = RomeReviewList.sort_values(['hotelName']).groupby('hotelName', sort = False).review_body.apply(''.join).reset_index(name='all_review')
     #Combining reviews for encoding
-        RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
-        return RomeReviewCombined
+    RomeReviewCombined['all_review'] = RomeReviewCombined['all_review'].apply(lambda x: re.sub('[^a-zA-z0-9\s]','',x))
+#        return RomeReviewCombined
 
     RomeReviewCombined = combine_review()
 
@@ -179,13 +179,13 @@ with model:
     query = st.text_input('Rome hotel lookup')
     st.write('The current hotel query is:', query)
 
-#    queries = re.split('[!?.]', query)
-#    queries = [i for i in queries if i]
+    queries = re.split('[!?.]', query)
+    queries = [i for i in queries if i]
 
-#    top_k = min(5, len(corpus))
-#    for query in queries:
-#        st.write(queries)
-'''
+    top_k = min(5, len(corpus))
+    for query in queries:
+        st.write(queries)
+
         query_embedding = model.encode(query, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
@@ -221,4 +221,3 @@ with model:
             st.pyplot()
             #st.plyplt.axis('off')
             #plt.show()
-'''
