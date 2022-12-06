@@ -9,3 +9,4 @@ matplotlib
 nltk
 wordcloud
 plotly
+numpy
