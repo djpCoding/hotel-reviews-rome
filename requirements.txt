@@ -1,10 +1,10 @@
-pandas
+pandas==1.2.5
 torchvision
 tqdm
 sentence_transformers
 spacy
 scipy
-streamlit
+streamlit==1.15.1
 matplotlib==3.6.0
 nltk==3.6.7
 wordcloud==1.8.1
