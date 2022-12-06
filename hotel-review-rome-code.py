@@ -184,12 +184,13 @@ with model:
 
     top_k = min(5, len(corpus))
     for query in queries:
-
+        st.write(queries)
+'''
         query_embedding = model.encode(query, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
-#        cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
-#        top_results = torch.topk(cos_scores, k=top_k)
+        cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
+        top_results = torch.topk(cos_scores, k=top_k)
 
         st.write("\n\n======================\n\n")
         st.write("Hotels that best accomodate the request:", query)
@@ -220,3 +221,4 @@ with model:
             st.pyplot()
             #st.plyplt.axis('off')
             #plt.show()
+'''
