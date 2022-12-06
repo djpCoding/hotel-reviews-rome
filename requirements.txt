@@ -6,7 +6,7 @@ spacy
 scipy
 streamlit
 matplotlib
-nltk
+nltk==3.6.7
 wordcloud==1.8.1
 numpy
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_sm-3.0.0.tar.gz
