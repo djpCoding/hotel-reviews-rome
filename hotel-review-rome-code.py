@@ -105,7 +105,7 @@ with model:
     st.header('Search for Rome your way.')
 #Get User Input
     queries = []
-    query = st.text_input('Rome hotel lookup:', "test")
+    query = st.text_input('Rome hotel lookup:')
     st.write('The current hotel query is:', query)
 
 
