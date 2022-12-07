@@ -25,13 +25,13 @@ from sentence_transformers import SentenceTransformer, util
 import scipy.spatial
 import pickle as pkl
 
-@st.cache(persist = True)
+@st.cache()
 def emb_material():
     embedder = SentenceTransformer('all-MiniLM-L6-v2')
     return embedder
 embedder = emb_material()
 
-@st.cache(persist = True)
+@st.cache(allow_output_mutation=True)
 def mod_material():
     model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
     return model
@@ -213,8 +213,8 @@ with features:
     st.write("\nTop 5 most similar hotels to your request:")
 
     for score, idx in zip(top_results[0], top_results[1]):
-        st.write("(Score: {:.4f})".format(score))
-        st.write(corpus[idx], "(Score: {:.4f})".format(score))
+#        st.write("(Score: {:.4f})".format(score))
+#        st.write(corpus[idx], "(Score: {:.4f})".format(score))
         row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
         inter_frame = row_dict['hotelName'].to_frame().T
         inter_frame2 = np.asarray(inter_frame)
