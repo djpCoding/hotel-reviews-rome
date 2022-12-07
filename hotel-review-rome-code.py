@@ -190,9 +190,8 @@ with features:
 
     top_k = min(5, len(corpus))
     for query in queries:
-        st.write(queries)
 
-        query_embedding = embedder.encode(query, convert_to_tensor=True)
+        query_embedding = model.encode(query, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
         cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
