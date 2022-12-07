@@ -173,7 +173,7 @@ with model:
 
     stopwords_cust = stopword()
 #Output generation
-with features():
+with features:
     queries = []
 
     query = st.text_input('Rome hotel lookup:', "test")
