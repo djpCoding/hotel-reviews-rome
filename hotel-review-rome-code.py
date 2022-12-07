@@ -25,6 +25,7 @@ from sentence_transformers import SentenceTransformer, util
 import scipy.spatial
 import pickle as pkl
 embedder = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
 from tqdm import tqdm
 from sentence_transformers import SentenceTransformer, util
 import torch
@@ -52,8 +53,9 @@ st.image("https://media.timeout.com/images/105211701/image.jpg")
 #@st.cache(persist=True)
 
 dataset = st.container()
-features = st.container()
 modelz = st.container()
+features = st.container()
+
 
 # Rome data importation and cleaning
 with dataset:
@@ -109,11 +111,6 @@ with modelz:
     st.write('The current hotel query is:', query)
 
 
-
-
-
-
-    model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
     embeddings = model.encode(corpus)
 #        return embeddings
 
