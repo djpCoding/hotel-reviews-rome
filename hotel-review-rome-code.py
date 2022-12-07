@@ -190,7 +190,7 @@ with features:
     queries = []
 
 
-    query = st.text_input('Rome hotel lookup:', "Putting in a placeholder")
+    query = st.text_input('Rome hotel lookup:', "E.g., somewhere near the spanish steps with a nice cafe")
     st.write('The current hotel query is:', query)
 #    def outputs(query):
 
