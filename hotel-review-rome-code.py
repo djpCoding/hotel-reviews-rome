@@ -24,8 +24,19 @@ punctuation=punctuation+ '\n'
 from sentence_transformers import SentenceTransformer, util
 import scipy.spatial
 import pickle as pkl
-embedder = SentenceTransformer('all-MiniLM-L6-v2')
-model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
+
+@st.cache(persist = True)
+def emb_material():
+    embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    return embedder
+embedder = emb_material()
+
+@st.cache(persist = True)
+def mod_material():
+    model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
+    return model
+model=mod_material()
+
 from tqdm import tqdm
 from sentence_transformers import SentenceTransformer, util
 import torch
@@ -55,6 +66,7 @@ st.image("https://media.timeout.com/images/105211701/image.jpg")
 dataset = st.container()
 modelz = st.container()
 features = st.container()
+
 
 
 # Rome data importation and cleaning
@@ -102,6 +114,7 @@ with dataset:
 #    st.write(corpus_embeddings)
 
     corpus_embeddings = corp_embed()
+
     embeddings = model.encode(corpus)
 
 with modelz:
@@ -158,7 +171,7 @@ with modelz:
         return hotel_summaries
 
 
-#    hotel_descriptions = hotel_summ()
+    hotel_descriptions = hotel_summ()
 
 #Adding and caching stopwords to increase speed
     @st.cache(persist=True)
@@ -175,6 +188,8 @@ with modelz:
 with features:
 
     queries = []
+
+
     query = st.text_input('Rome hotel lookup:', "Putting in a placeholder")
     st.write('The current hotel query is:', query)
 #    def outputs(query):
@@ -189,7 +204,7 @@ with features:
         query_embedding = model.encode(query, convert_to_tensor=True)
         return query_embedding
 
-# We use cosine-similarity and torch.topk to find the highest 5 scores
+ #We use cosine-similarity and torch.topk to find the highest 5 scores
     cos_scores = util.pytorch_cos_sim(query_embedd(), embeddings)[0]
     top_results = torch.topk(cos_scores, k=top_k)
 
@@ -198,8 +213,8 @@ with features:
     st.write("\nTop 5 most similar hotels to your request:")
 
     for score, idx in zip(top_results[0], top_results[1]):
-#            st.write("(Score: {:.4f})".format(score))
-#            st.write(corpus[idx], "(Score: {:.4f})".format(score))
+        st.write("(Score: {:.4f})".format(score))
+        st.write(corpus[idx], "(Score: {:.4f})".format(score))
         row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
         inter_frame = row_dict['hotelName'].to_frame().T
         inter_frame2 = np.asarray(inter_frame)
@@ -211,8 +226,8 @@ with features:
         else:
             st.markdown('_We show this as a fair fit!_')
         st.write('This hotel is most frequently described as:')
-#        inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
-#        st.write(inter_summ[0])
+        inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
+        st.write(inter_summ[0])
         wordcloud = WordCloud(stopwords = stopwords_cust, max_words = 30, max_font_size=50,
                                 colormap='Set2',
                                 collocations=True, background_color="white").generate(corpus[idx])
