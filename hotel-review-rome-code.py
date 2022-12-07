@@ -119,7 +119,7 @@ with model:
         return embeddings
 
     embeddings = model_embed()
-    st.write(embeddings)
+#    st.write(embeddings)
 
 #Generating Hotel Summaries to display
     hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
@@ -192,7 +192,7 @@ with features:
     for query in queries:
         st.write(queries)
 
-        query_embedding = model.encode(query, convert_to_tensor=True)
+        query_embedding = model.encode(query)#, convert_to_tensor=True)
 
     # We use cosine-similarity and torch.topk to find the highest 5 scores
         cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
