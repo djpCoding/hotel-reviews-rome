@@ -25,7 +25,7 @@ from sentence_transformers import SentenceTransformer, util
 import scipy.spatial
 import pickle as pkl
 
-@st.cache()
+@st.cache(allow_output_mutation=True)
 def emb_material():
     embedder = SentenceTransformer('all-MiniLM-L6-v2')
     return embedder
