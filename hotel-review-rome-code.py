@@ -113,6 +113,7 @@ with model:
 #Sentence Transforms
     model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
     embeddings = model.encode(corpus)
+    st.write(corpus)
 
 #Generating Hotel Summaries to display
     hotel_summaries = pd.DataFrame(columns = ['Hotel', 'Summary'])
