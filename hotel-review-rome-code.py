@@ -112,13 +112,12 @@ with model:
 
 
 
-#Sentence Transforms
-    def model_embed():
-        model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
-        embeddings = model.encode(corpus)
-        return embeddings
 
-    embeddings = model_embed()
+    model = SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1')
+    embeddings = model.encode(corpus)
+#        return embeddings
+
+#    embeddings = model_embed()
 #    st.write(embeddings)
 
 #Generating Hotel Summaries to display
