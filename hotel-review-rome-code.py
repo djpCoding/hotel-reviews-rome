@@ -179,45 +179,46 @@ with model:
     query = st.text_input('Rome hotel lookup:', "test")
     st.write('The current hotel query is:', query)
 
-#    queries = re.split('[!?.]', query)
-#    queries = [i for i in queries if i]
+    def outputs(query):
+    #    queries = re.split('[!?.]', query)
+    #    queries = [i for i in queries if i]
 
-    top_k = min(5, len(corpus))
-#    for query in queries:
-#        st.write(queries)
+        top_k = min(5, len(corpus))
+    #    for query in queries:
+    #        st.write(queries)
 
-    query_embedding = model.encode(query, convert_to_tensor=True)
+        query_embedding = model.encode(query, convert_to_tensor=True)
 
-# We use cosine-similarity and torch.topk to find the highest 5 scores
-    cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
-    top_results = torch.topk(cos_scores, k=top_k)
+    # We use cosine-similarity and torch.topk to find the highest 5 scores
+        cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
+        top_results = torch.topk(cos_scores, k=top_k)
 
-    st.write("\n\n======================\n\n")
-    st.write("Hotels that best accomodate the request:", query)
-    st.write("\nTop 5 most similar hotels to your request:")
+        st.write("\n\n======================\n\n")
+        st.write("Hotels that best accomodate the request:", query)
+        st.write("\nTop 5 most similar hotels to your request:")
 
-    for score, idx in zip(top_results[0], top_results[1]):
-#            st.write("(Score: {:.4f})".format(score))
-#            st.write(corpus[idx], "(Score: {:.4f})".format(score))
-        row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
-        inter_frame = row_dict['hotelName'].to_frame().T
-        inter_frame2 = np.asarray(inter_frame)
-        st.subheader(inter_frame2[0,0] , "\n")
-        if score > .45:
-            st.markdown("_We show this as a great fit!_")
-        elif score > .35 and score <= .45:
-             st.markdown("_We show this as a good fit!_")
-        else:
-            st.markdown('_We show this as a fair fit!_')
-        st.write('This hotel is most frequently described as:')
-        inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
-        st.write(inter_summ[0])
-        wordcloud = WordCloud(stopwords = stopwords_cust, max_words = 30, max_font_size=50,
-                                colormap='Set2',
-                                collocations=True, background_color="white").generate(corpus[idx])
-        plt.imshow(wordcloud, interpolation='bilinear')
-        plt.axis('off')
+        for score, idx in zip(top_results[0], top_results[1]):
+    #            st.write("(Score: {:.4f})".format(score))
+    #            st.write(corpus[idx], "(Score: {:.4f})".format(score))
+            row_dict = Rome.loc[Rome['all_review']== corpus[idx]]
+            inter_frame = row_dict['hotelName'].to_frame().T
+            inter_frame2 = np.asarray(inter_frame)
+            st.subheader(inter_frame2[0,0] , "\n")
+            if score > .45:
+                st.markdown("_We show this as a great fit!_")
+            elif score > .35 and score <= .45:
+                 st.markdown("_We show this as a good fit!_")
+            else:
+                st.markdown('_We show this as a fair fit!_')
+            st.write('This hotel is most frequently described as:')
+            inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
+            st.write(inter_summ[0])
+            wordcloud = WordCloud(stopwords = stopwords_cust, max_words = 30, max_font_size=50,
+                                    colormap='Set2',
+                                    collocations=True, background_color="white").generate(corpus[idx])
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis('off')
 
-        st.pyplot()
-        #st.plyplt.axis('off')
-        #plt.show()
+            st.pyplot()
+            #st.plyplt.axis('off')
+            #plt.show()
