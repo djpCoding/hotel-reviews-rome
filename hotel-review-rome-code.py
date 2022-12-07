@@ -21,7 +21,7 @@ from spacy import displacy
 stopwords=list(STOP_WORDS)
 from string import punctuation
 punctuation=punctuation+ '\n'
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 import scipy.spatial
 import pickle as pkl
 embedder = SentenceTransformer('all-MiniLM-L6-v2')
@@ -53,7 +53,7 @@ st.image("https://media.timeout.com/images/105211701/image.jpg")
 
 dataset = st.container()
 features = st.container()
-model = st.container()
+modelz = st.container()
 
 # Rome data importation and cleaning
 with dataset:
@@ -101,7 +101,7 @@ with dataset:
 
     corpus_embeddings = corp_embed()
 
-with model:
+with modelz:
     st.header('Search for Rome your way.')
 #Get User Input
     queries = []
