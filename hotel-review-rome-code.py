@@ -33,8 +33,8 @@ import torchvision
 import re
 import numpy as np
 import nltk
-nltk.download('stopwords')
-nltk.download('punkt')
+#nltk.download('stopwords')
+#nltk.download('punkt')
 import heapq
 import matplotlib
 import matplotlib.pyplot as plt
