@@ -158,7 +158,7 @@ with modelz:
         return hotel_summaries
 
 
-    hotel_descriptions = hotel_summ()
+#    hotel_descriptions = hotel_summ()
 
 #Adding and caching stopwords to increase speed
     @st.cache(persist=True)
@@ -175,7 +175,7 @@ with modelz:
 with features:
 
     queries = []
-    query = st.text_input('Rome hotel lookup:')
+    query = st.text_input('Rome hotel lookup:', "Putting in a placeholder")
     st.write('The current hotel query is:', query)
 #    def outputs(query):
 
@@ -185,10 +185,12 @@ with features:
     top_k = min(5, len(corpus))
     # for query in queries:
 
-    query_embedding = model.encode(query, convert_to_tensor=True)
+    def query_embedd():
+        query_embedding = model.encode(query, convert_to_tensor=True)
+        return query_embedding
 
 # We use cosine-similarity and torch.topk to find the highest 5 scores
-    cos_scores = util.pytorch_cos_sim(query_embedding, embeddings)[0]
+    cos_scores = util.pytorch_cos_sim(query_embedd(), embeddings)[0]
     top_results = torch.topk(cos_scores, k=top_k)
 
     st.write("\n\n======================\n\n")
@@ -209,8 +211,8 @@ with features:
         else:
             st.markdown('_We show this as a fair fit!_')
         st.write('This hotel is most frequently described as:')
-        inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
-        st.write(inter_summ[0])
+#        inter_summ = np.asarray(hotel_descriptions.loc[hotel_descriptions['Hotel'] == inter_frame2[0,0]].Summary)
+#        st.write(inter_summ[0])
         wordcloud = WordCloud(stopwords = stopwords_cust, max_words = 30, max_font_size=50,
                                 colormap='Set2',
                                 collocations=True, background_color="white").generate(corpus[idx])
